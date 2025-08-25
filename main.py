@@ -31,6 +31,14 @@ from PyQt6.QtCore import QPoint, QRect, Qt, QSize, QTimer
 windowLabel = None
 window = None
 
+
+# Helper object to safely update the window label from worker threads
+class LabelUpdater(QtCore.QObject):
+    textChanged = QtCore.pyqtSignal(str)
+
+
+labelUpdater = LabelUpdater()
+
 # Window manager, manages stuff related to window
 class WindowManager(QMainWindow):
     # Statup window manager
@@ -59,6 +67,7 @@ class WindowManager(QMainWindow):
         windowLabel.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)  # Center the text
         windowLabel.setGeometry(2, 2, 200, 50)
         windowLabel.setStyleSheet(self.__initWindowLabelStyleBuilder())
+        labelUpdater.textChanged.connect(windowLabel.setText)
 
     def __initWindowLabelStyleBuilder(self):
         return """
@@ -293,17 +302,20 @@ class TrayIconManager:
 
 # Speech converter management
 class SpeechConverter:
+    def _update_label(self, text: str) -> None:
+        labelUpdater.textChanged.emit(text)
+
     # Initialize the speech converter
     def __init__(self):
         try:
             self.stream = None
             self.streamThread = None
             self.transcriptionThread = None
-            windowLabel.setText("STT startup\nLoading up settings")
+            self._update_label("STT startup\nLoading up settings")
             logging.debug("Setting audio chunk sizes")
             settings.audioChunkSize = int(settings.audioSampleRate * settings.audioChunkDuration)
             settings.audioChunkOverlapSize = int(settings.audioSampleRate * settings.audioChunkOverlapDuration)
-            windowLabel.setText("STT startup\nLoading STT model")
+            self._update_label("STT startup\nLoading STT model")
             logging.debug("Loading speech to text model")
             self.model = WhisperModel(
                 model_size_or_path = settings.whisperModel,
@@ -313,22 +325,22 @@ class SpeechConverter:
                 num_workers = settings.whisperNumWorkers
                 )
             logging.debug("Model loaded")
-            windowLabel.setText("STT startup\nSetting up audio queue")
+            self._update_label("STT startup\nSetting up audio queue")
             logging.debug("Starting audio queue")
             self.audioQueue = Queue()
             logging.debug("Queue started")
-            windowLabel.setText("STT startup\nLoading VAD model")
+            self._update_label("STT startup\nLoading VAD model")
             logging.debug("Loading vad model")
             self.vadModel, utils = torch.hub.load(
-                repo_or_dir = 'snakers4/silero-vad', 
-                model = 'silero_vad', 
+                repo_or_dir = 'snakers4/silero-vad',
+                model = 'silero_vad',
                 force_reload = settings.vadForceRedownload
                 )
             (get_speech_timestamps, _, _, _, _) = utils
             logging.debug("Model loaded")
-            windowLabel.setText("Ready!")
+            self._update_label("Ready!")
         except Exception as error:
-            windowLabel.setText("Failed to start STT!\nPlease check logs")
+            self._update_label("Failed to start STT!\nPlease check logs")
             logging.error(f"Failed to initialize speech converter: {error}")
         else:
             logging.info("Initialized speech converter")
@@ -416,7 +428,7 @@ class SpeechConverter:
         # SpeechConverter.stop(self)
         _isRecording = True
         _recordSignal = True
-        windowLabel.setText("Recording/Processing...")
+        self._update_label("Recording/Processing...")
         logging.info("Started recording")
 
         # Start transcription in a separate thread
@@ -439,7 +451,7 @@ class SpeechConverter:
         #    transcriptionThread.start()
         #    while (_recordSignal == True): pass
 
-        #windowLabel.setText("Stopped recording..")
+        #self._update_label("Stopped recording..")
         #logging.info("Stopped recording")
 
 
@@ -471,7 +483,7 @@ class SpeechConverter:
             logging.info("Transcription thread joined")
             self.transcriptionThread = None
 
-        windowLabel.setText("Stopped recording..")
+        self._update_label("Stopped recording..")
 
 # Settings manager 
 class SettingsManager:
@@ -763,7 +775,7 @@ if __name__ == "__main__":
             #logging.debug("Application is running")
             #try: windowLabel
             #except Exception as error: logging.debug(f"Failed to get Window Label var, {error}")
-            #else: windowLabel.setText("OK")
+            #else: labelUpdater.textChanged.emit("OK")
             #time.sleep(2)
             pass
     except KeyboardInterrupt:
