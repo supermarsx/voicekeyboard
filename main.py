@@ -283,17 +283,17 @@ class TrayIconManager:
 # Speech converter management
 class SpeechConverter:
     # Initialize the speech converter
-    def __init__(self):
+    def __init__(self, windowLabel: QLabel):
         try:
-            global windowLabel
+            self.windowLabel = windowLabel
             self.stream = None
             self.streamThread = None
             self.transcriptionThread = None
-            windowLabel.setText("STT startup\nLoading up settings")
+            self.windowLabel.setText("STT startup\nLoading up settings")
             logging.debug("Setting audio chunk sizes")
             settings.audioChunkSize = int(settings.audioSampleRate * settings.audioChunkDuration)
             settings.audioChunkOverlapSize = int(settings.audioSampleRate * settings.audioChunkOverlapDuration)
-            windowLabel.setText("STT startup\nLoading STT model")
+            self.windowLabel.setText("STT startup\nLoading STT model")
             logging.debug("Loading speech to text model")
             self.model = WhisperModel(
                 model_size_or_path = settings.whisperModel,
@@ -303,11 +303,11 @@ class SpeechConverter:
                 num_workers = settings.whisperNumWorkers
                 )
             logging.debug("Model loaded")
-            windowLabel.setText("STT startup\nSetting up audio queue")
+            self.windowLabel.setText("STT startup\nSetting up audio queue")
             logging.debug("Starting audio queue")
             self.audioQueue = Queue()
             logging.debug("Queue started")
-            windowLabel.setText("STT startup\nLoading VAD model")
+            self.windowLabel.setText("STT startup\nLoading VAD model")
             logging.debug("Loading vad model")
             self.vadModel, utils = torch.hub.load(
                 repo_or_dir = 'snakers4/silero-vad', 
@@ -316,9 +316,9 @@ class SpeechConverter:
                 )
             (get_speech_timestamps, _, _, _, _) = utils
             logging.debug("Model loaded")
-            windowLabel.setText("Ready!")
+            self.windowLabel.setText("Ready!")
         except Exception as error:
-            windowLabel.setText("Failed to start STT!\nPlease check logs")
+            self.windowLabel.setText("Failed to start STT!\nPlease check logs")
             logging.error(f"Failed to initialize speech converter: {error}")
         else:
             logging.info("Initialized speech converter")
@@ -406,12 +406,12 @@ class SpeechConverter:
         # SpeechConverter.stop(self)
         _isRecording = True
         _recordSignal = True
-        windowLabel.setText("Recording/Processing...")
+        self.windowLabel.setText("Recording/Processing...")
         logging.info("Started recording")
 
         # Start transcription in a separate thread
-        transcriptionThread = threading.Thread(target=self.processAudioStream, daemon=True)
-        transcriptionThread.start()
+        self.transcriptionThread = threading.Thread(target=self.processAudioStream, daemon=True)
+        self.transcriptionThread.start()
 
         # Start persistent input stream
         self.streamThread = threading.Thread(target=self._run_audio_stream, daemon=True)
@@ -461,7 +461,7 @@ class SpeechConverter:
             logging.info("Transcription thread joined")
             self.transcriptionThread = None
 
-        windowLabel.setText("Stopped recording..")
+        self.windowLabel.setText("Stopped recording..")
 
 # Settings manager 
 class SettingsManager:
@@ -749,7 +749,7 @@ if __name__ == "__main__":
 
     Generic.startup()
 
-    speechConverter: SpeechConverter = SpeechConverter()
+    speechConverter: SpeechConverter = SpeechConverter(windowLabel)
 
     settings.loadHotkeys()
 
