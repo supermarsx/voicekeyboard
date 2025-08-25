@@ -1,6 +1,5 @@
 import sys
 import time
-from turtle import st
 import keyboard
 import os
 import logging
@@ -11,9 +10,8 @@ import threading
 from threading import Lock
 from queue import Queue
 import subprocess
-import pyautogui
 
-from silero_vad import get_speech_timestamps, read_audio
+from silero_vad import get_speech_timestamps
 
 from faster_whisper import WhisperModel
 
@@ -25,11 +23,13 @@ from pystray import Icon, Menu, MenuItem
 
 from configparser import ConfigParser
 
-import PyQt6
-from PyQt6 import QtGui, QtCore, QtWidgets, uic
+from PyQt6 import QtCore
 from PyQt6.QtWidgets import QMainWindow, QApplication, QLabel
-from PyQt6.QtGui import QImage, QPainter, QPixmap, QRegion, QColor
+from PyQt6.QtGui import QImage, QPainter, QPixmap
 from PyQt6.QtCore import QPoint, QRect, Qt, QSize, QTimer
+
+windowLabel = None
+window = None
 
 # Window manager, manages stuff related to window
 class WindowManager(QMainWindow):
@@ -178,7 +178,6 @@ class WindowManager(QMainWindow):
 
     def run():
         global window
-        global windowLabel
         application: QApplication = QApplication(sys.argv)
         with lock:
             window = WindowManager()
@@ -250,12 +249,11 @@ class TrayIconManager:
         pass
 
     def run():
-        global window
-         # Create menu items
+        # Create menu items
         menu: Menu = TrayIconManager.menuInit()
         # Create the tray icon
         icon = Icon(
-            settings.labelTrayIconTitle, 
+            settings.labelTrayIconTitle,
             ImageWrapper.createImage(),
             settings.labelTrayIconName,
             menu
@@ -285,7 +283,6 @@ class SpeechConverter:
     # Initialize the speech converter
     def __init__(self):
         try:
-            global windowLabel
             self.stream = None
             self.streamThread = None
             self.transcriptionThread = None
@@ -744,8 +741,6 @@ if __name__ == "__main__":
     _recordSignal: bool = False
     lock: Lock = threading.Lock()
     settings: SettingsManager = SettingsManager()
-    windowLabel: QLabel
-    window: WindowManager
 
     Generic.startup()
 
