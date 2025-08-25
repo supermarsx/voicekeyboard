@@ -694,12 +694,8 @@ class Generic:
 
     # Wait for window label variable
     def waitWindowLabelVar():
-        while True:
-            try: 
-                windowLabel 
-                break
-            except: 
-                pass
+        while 'windowLabel' not in globals():
+            time.sleep(0.1)
 
     # Open settings file
     def openSettings():
