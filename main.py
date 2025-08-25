@@ -176,6 +176,7 @@ class WindowManager(QMainWindow):
                 settings.windowPosY = windowPosition.y()
                 event.accept()
 
+    @staticmethod
     def run():
         global window
         application: QApplication = QApplication(sys.argv)
@@ -184,6 +185,7 @@ class WindowManager(QMainWindow):
             if (settings.windowShow): window.show()
         application.exec()
 
+    @staticmethod
     def start():
         windowThread = threading.Thread(
             target = WindowManager.run, 
@@ -193,6 +195,7 @@ class WindowManager(QMainWindow):
 
 # Image creator wrapper
 class ImageWrapper:
+    @staticmethod
     def createImage():
         try:
             width: int = 64
@@ -212,13 +215,16 @@ class ImageWrapper:
 class TrayIconManager:
     icon = None
     # On click event
+    @staticmethod
     def onClick(icon, item):
         print(f"Menu item '{item}' clicked!")
    
     # Initialization
+    @staticmethod
     def setup(icon):
         icon.visible: bool = True
 
+    @staticmethod
     def menuInit():
         return Menu(
             MenuItem(text = settings.labelTrayMenuTitle, action = TrayIconManager.onClickNull),
@@ -229,13 +235,15 @@ class TrayIconManager:
             MenuItem(text = settings.labelTrayMenuExit, action = Generic._exit)
         )
 
+    @staticmethod
     def subMenuWindowInit():
         return Menu(
             MenuItem(text = settings.labelTrayMenuToggleWindow, action = TrayIconManager.toggleWindow),
             MenuItem(text = settings.labelTrayMenuOpenSettings, action = Generic.openSettings)
         )
 
-    def toggleWindow(self):
+    @staticmethod
+    def toggleWindow(icon, item):
         if (settings.windowShow):
             with lock:
                 window.hide()
@@ -246,9 +254,11 @@ class TrayIconManager:
             settings.windowShow = True
 
     # Simple null click passthrough for tests
+    @staticmethod
     def onClickNull():
         pass
 
+    @staticmethod
     def run():
         # Create menu items
         menu: Menu = TrayIconManager.menuInit()
@@ -262,6 +272,7 @@ class TrayIconManager:
         # Run the icon in a blocking manner
         TrayIconManager.icon.run(setup = TrayIconManager.setup)
 
+    @staticmethod
     def start():
         if not (settings.trayIconShow): return None
         trayThread = threading.Thread(
@@ -270,6 +281,7 @@ class TrayIconManager:
         )
         trayThread.start()
 
+    @staticmethod
     def stop():
         try:
             logging.debug("Stopping tray icon")
