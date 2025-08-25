@@ -210,6 +210,7 @@ class ImageWrapper:
 
 # Tray icon management
 class TrayIconManager:
+    icon = None
     # On click event
     def onClick(icon, item):
         print(f"Menu item '{item}' clicked!")
@@ -252,14 +253,14 @@ class TrayIconManager:
         # Create menu items
         menu: Menu = TrayIconManager.menuInit()
         # Create the tray icon
-        icon = Icon(
+        TrayIconManager.icon = Icon(
             settings.labelTrayIconTitle,
             ImageWrapper.createImage(),
             settings.labelTrayIconName,
             menu
         )
         # Run the icon in a blocking manner
-        icon.run(setup = TrayIconManager.setup)
+        TrayIconManager.icon.run(setup = TrayIconManager.setup)
 
     def start():
         if not (settings.trayIconShow): return None
@@ -272,7 +273,7 @@ class TrayIconManager:
     def stop():
         try:
             logging.debug("Stopping tray icon")
-            lambda icon, item: icon.stop()
+            TrayIconManager.icon.stop()
         except Exception as error:
             logging.error(f"Failed to stop with error: {error}")
         else:
