@@ -673,11 +673,17 @@ class Hotkeys:
             logging.debug(f"Loaded stop recording hotkey: {settings.hotkeyStopRecording}")
 
         def pushToTalk():
-            keyboard.add_hotkey(
-                settings.hotkeyStartRecording,
-                speechConverter.start
+            keyboard.on_press_key(
+                settings.hotkeyPushToTalk,
+                lambda event: speechConverter.start()
             )
-            logging.debug(f"Loaded push-to-talk recording hotkey: {settings.hotkeyStartRecording}")
+            keyboard.on_release_key(
+                settings.hotkeyPushToTalk,
+                lambda event: speechConverter.stop()
+            )
+            logging.debug(
+                f"Loaded push-to-talk recording hotkey: {settings.hotkeyPushToTalk}"
+            )
 
 
         def allKeys():
