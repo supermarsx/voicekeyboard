@@ -432,8 +432,10 @@ class SpeechConverter:
         logging.info("Started recording")
 
         # Start transcription in a separate thread
-        transcriptionThread = threading.Thread(target=self.processAudioStream, daemon=True)
-        transcriptionThread.start()
+        self.transcriptionThread = threading.Thread(
+            target=self.processAudioStream, daemon=True
+        )
+        self.transcriptionThread.start()
 
         # Start persistent input stream
         self.streamThread = threading.Thread(target=self._run_audio_stream, daemon=True)
@@ -457,7 +459,8 @@ class SpeechConverter:
 
     # Stop recording
     def stop(self):
-        global _recordSignal
+        global _isRecording, _recordSignal
+        _isRecording = False
         _recordSignal = False
         logging.info("Stopping STT system")
 
@@ -478,9 +481,10 @@ class SpeechConverter:
             self.streamThread = None
 
         # Join transcription thread
-        if self.transcriptionThread and self.transcriptionThread.is_alive():
-            self.transcriptionThread.join(timeout=2)
-            logging.info("Transcription thread joined")
+        if self.transcriptionThread:
+            if self.transcriptionThread.is_alive():
+                self.transcriptionThread.join(timeout=2)
+                logging.info("Transcription thread joined")
             self.transcriptionThread = None
 
         self._update_label("Stopped recording..")
