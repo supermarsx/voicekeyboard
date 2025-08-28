@@ -1,6 +1,6 @@
 # VoiceKeyboard
 
-Simple voice-to-text hotkey utility using Faster-Whisper and Silero VAD.
+Simple voice-to-text utility using Faster-Whisper and Silero VAD.
 
 ## Development
 
