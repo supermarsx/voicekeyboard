@@ -1,0 +1,2 @@
+[console_scripts]
+voicekeyboard = voicekeyboard.app:main

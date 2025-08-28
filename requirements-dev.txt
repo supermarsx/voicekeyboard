@@ -1,0 +1,12 @@
+-r requirements.txt
+
+pytest
+pytest-mock
+ruff
+black
+pre-commit
+mypy
+mkdocs
+mkdocs-material
+mkdocstrings
+mkdocstrings-python

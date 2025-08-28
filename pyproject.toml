@@ -1,0 +1,95 @@
+[tool.black]
+line-length = 100
+target-version = ["py311", "py310", "py39"]
+
+[tool.ruff]
+line-length = 100
+exclude = [
+  "cublas64_12.dll",
+  "cublasLt64_12.dll",
+  "cudart64_12.dll",
+  "cudnn*.dll",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = [
+  # Allow prints for this CLI-style app
+  "T201",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[project]
+name = "voicekeyboard"
+version = "0.2.0"
+description = "Voice to text hotkey utility using Faster-Whisper and Silero VAD"
+readme = "readme.md"
+requires-python = ">=3.9"
+authors = [{ name = "VoiceKeyboard Devs" }]
+dependencies = [
+  "keyboard",
+  "numpy",
+  "sounddevice",
+  "torch",
+  "faster-whisper",
+  "Pillow",
+  "pystray",
+  "PyQt6",
+]
+
+[project.scripts]
+voicekeyboard = "voicekeyboard.app:main"
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_ignores = true
+no_implicit_optional = true
+check_untyped_defs = true
+disallow_incomplete_defs = false
+disallow_untyped_defs = false
+
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["voicekeyboard"]
+
+[project.optional-dependencies]
+# Grouped extras for more granular installs (base deps remain above for simplicity)
+gui = [
+  "PyQt6",
+  "pystray",
+  "Pillow",
+]
+ml = [
+  "torch",
+  "faster-whisper",
+]
+audio = [
+  "sounddevice",
+  "numpy",
+]
+docs = [
+  "mkdocs",
+  "mkdocs-material",
+  "mkdocstrings",
+  "mkdocstrings-python",
+  "griffe",
+]
+dev = [
+  "pytest",
+  "ruff",
+  "black",
+  "mypy",
+  "pre-commit",
+  "mkdocs",
+  "mkdocs-material",
+  "mkdocstrings",
+  "mkdocstrings-python",
+  "griffe",
+]

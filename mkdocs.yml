@@ -1,0 +1,36 @@
+site_name: VoiceKeyboard Docs
+repo_url: https://github.com/your-org/voicekeyboard
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+nav:
+  - Home: index.md
+  - Usage: usage.md
+  - Development: development.md
+  - API Reference:
+    - Settings: api/settings.md
+    - Window: api/window.md
+    - STT: api/stt.md
+    - Tray: api/tray.md
+    - Hotkeys: api/hotkeys.md
+    - Preferences: api/preferences.md
+    - App: api/app.md
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            heading_level: 2
+            filters: []
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true

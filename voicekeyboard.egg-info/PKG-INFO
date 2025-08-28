@@ -1,0 +1,53 @@
+Metadata-Version: 2.4
+Name: voicekeyboard
+Version: 0.1.0
+Summary: Voice to text hotkey utility using Faster-Whisper and Silero VAD
+Author: VoiceKeyboard Devs
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: license.md
+Requires-Dist: keyboard
+Requires-Dist: numpy
+Requires-Dist: sounddevice
+Requires-Dist: torch
+Requires-Dist: faster-whisper
+Requires-Dist: Pillow
+Requires-Dist: pystray
+Requires-Dist: PyQt6
+Dynamic: license-file
+
+# VoiceKeyboard
+
+Simple voice-to-text hotkey utility using Faster-Whisper and Silero VAD.
+
+Development quickstart
+- Create a virtualenv and install dev deps: `pip install -r requirements-dev.txt`
+- Run lint: `ruff check . && black --check .`
+- Run tests: `VOICEKB_DRYRUN=1 pytest`
+ - Optional GUI smoke locally (Linux): `VOICEKB_DRYRUN=1 VOICEKB_AUTOCLOSE_MS=500 xvfb-run -a pytest -q tests/test_gui_smoke.py`
+ - Optional: enable git hooks with `pre-commit install` (CI runs hooks too)
+
+Notes
+- Set `VOICEKB_DRYRUN=1` to skip heavy model downloads and VAD init during tests and CI.
+- Set `VOICEKB_HEADLESS=1` to skip starting the Qt window and tray icon during tests/CI.
+- Set `VOICEKB_DISABLE_HOTKEYS=1` to avoid registering system-wide hotkeys (useful in CI or shared machines).
+- Runtime dependencies like PyQt6, sounddevice, and GPU libs require a desktop environment and audio device.
+
+Run
+- After install, launch with: `voicekeyboard`
+
+Packaging
+- Build with PyInstaller (basic spec in `packaging/voicekeyboard.spec`):
+  - `pip install pyinstaller`
+  - `pyinstaller packaging/voicekeyboard.spec`
+  - Note: packaging Whisper/Torch can be large; adjust spec as needed for your platform.
+ - Windows: `pyinstaller packaging/windows.spec` (sets icon, no console).
+ - macOS: `pyinstaller packaging/macos.spec` (you may need to sign/notarize).
+
+Type checking
+- Run mypy: `mypy .`
+
+Docs
+- Local docs server: `mkdocs serve`
+- Build static site: `mkdocs build`
+- GitHub Pages deployment: enabled via `.github/workflows/docs.yml`
