@@ -7,8 +7,11 @@ tests/test_hotkeys_service.py
 tests/test_label_updater.py
 tests/test_open_settings.py
 tests/test_preferences_dialog.py
+tests/test_preferences_input_device.py
+tests/test_ring_buffer.py
 tests/test_settings.py
 tests/test_settings_defaults.py
+tests/test_settings_validation.py
 tests/test_startup.py
 tests/test_stt_processing.py
 tests/test_tray_menu.py

@@ -35,7 +35,8 @@ class HotkeysManager:
         logging.debug("Loading hotkeys")
         self.register_start()
         self.register_stop()
-        self.register_push_to_talk()
+        if settings.pushToTalk:
+            self.register_push_to_talk()
 
 
 class HotkeysService:

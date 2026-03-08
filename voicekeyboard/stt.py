@@ -6,6 +6,7 @@ from collections import deque
 from queue import Queue
 from typing import Any, Callable, Deque, Dict, List, Optional
 
+import keyboard
 import numpy
 
 from .settings import settings
@@ -196,6 +197,8 @@ class SpeechConverter:
                         text = " ".join([seg.text for seg in segments])
                         if text:
                             logging.info(f"Typing: {text}")
+                            self._update_label(text)
+                            keyboard.write(text)
                 # Reset buffer after processing a batch to keep latency low
                 ring.clear()
             except Exception as e:
