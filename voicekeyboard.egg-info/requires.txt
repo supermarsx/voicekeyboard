@@ -1,8 +1,0 @@
-keyboard
-numpy
-sounddevice
-torch
-faster-whisper
-Pillow
-pystray
-PyQt6

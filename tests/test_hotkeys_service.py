@@ -22,6 +22,10 @@ def test_hotkeys_service_start_stop(monkeypatch):
     monkeypatch.setattr(kb, "on_release_key", fake_on_release_key)
     monkeypatch.setenv("VOICEKB_DISABLE_HOTKEYS", "0")
 
+    from voicekeyboard.settings import settings
+
+    monkeypatch.setattr(settings, "pushToTalk", True)
+
     manager = HotkeysManager(lambda: None, lambda: None)
     svc = HotkeysService(manager)
     svc.start()
